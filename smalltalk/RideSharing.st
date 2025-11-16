@@ -5,98 +5,114 @@
    - PremiumRide
    - Driver
    - Rider
- This code demonstrates encapsulation, inheritance,
- and polymorphism for MSCS 624 assignment."
+ Demonstrates encapsulation, inheritance, and polymorphism.
+"
 
-" Base class: Ride "
+" CLASS DEFINITIONS "
 
 Object subclass: #Ride
     instanceVariableNames: 'rideId pickupLocation dropoffLocation distanceMiles fareTotal'
     classVariableNames: ''
     poolDictionaries: ''
-    category: 'RideSharing'.
-
-
-"Initialization"
-
-Ride >> initializeWithId: anId
-       pickup: pickup
-       dropoff: dropoff
-       distance: dist
-    rideId := anId.
-    pickupLocation := pickup.
-    dropoffLocation := dropoff.
-    distanceMiles := dist.
-    fareTotal := 0.0.
-
-
-"Abstract protocol - subclasses must override these"
-
-Ride >> computeFare
-    "Abstract method - subclasses provide implementation."
-    self subclassResponsibility.
-
-Ride >> printRideDetails
-    "Abstract method - subclasses provide implementation."
-    self subclassResponsibility.
-
-
-"Encapsulated getters and setter"
-
-Ride >> rideId
-    ^ rideId.
-
-Ride >> distanceMiles
-    ^ distanceMiles.
-
-Ride >> fareTotal
-    ^ fareTotal.
-
-Ride >> fareTotal: aNumber
-    fareTotal := aNumber.
-
-
-
-"StandardRide class"
+    category: 'RideSharing'!
 
 Ride subclass: #StandardRide
     instanceVariableNames: ''
     classVariableNames: ''
     poolDictionaries: ''
-    category: 'RideSharing'.
+    category: 'RideSharing'!
+
+Ride subclass: #PremiumRide
+    instanceVariableNames: ''
+    classVariableNames: ''
+    poolDictionaries: ''
+    category: 'RideSharing'!
+
+Object subclass: #Driver
+    instanceVariableNames: 'driverId driverName driverRating completedRides'
+    classVariableNames: ''
+    poolDictionaries: ''
+    category: 'RideSharing'!
+
+Object subclass: #Rider
+    instanceVariableNames: 'riderId riderName rideHistory'
+    classVariableNames: ''
+    poolDictionaries: ''
+    category: 'RideSharing'!
 
 
-StandardRide >> computeFare
+"RIDE METHODS  "
+
+Ride methodsFor: 'initialization'!
+
+initializeWithId: anId
+    pickup: pickup
+    dropoff: dropoff
+    distance: dist
+    "Initialize a ride with basic information."
+    rideId := anId.
+    pickupLocation := pickup.
+    dropoffLocation := dropoff.
+    distanceMiles := dist.
+    fareTotal := 0.0.!
+
+!
+
+Ride methodsFor: 'api'!
+
+computeFare
+    "Abstract method - subclasses must implement."
+    self subclassResponsibility.!
+
+printRideDetails
+    "Abstract method - subclasses must implement."
+    self subclassResponsibility.!
+
+rideId
+    ^ rideId.!
+
+distanceMiles
+    ^ distanceMiles.!
+
+fareTotal
+    ^ fareTotal.!
+
+fareTotal: aNumber
+    fareTotal := aNumber.!
+
+!
+
+
+"  STANDARD RIDE METHODS  "
+
+StandardRide methodsFor: 'api'!
+
+computeFare
     "Simple fare formula for standard rides."
     | baseFare perMile total |
     baseFare := 1.5.
     perMile := 1.8.
     total := baseFare + (perMile * distanceMiles).
     self fareTotal: total.
-    ^ total.
+    ^ total.!
 
-
-StandardRide >> printRideDetails
+printRideDetails
     Transcript
         show: '[Standard] Ride ID: ', rideId printString;
         show: ' | From: ', pickupLocation;
         show: ' | To: ', dropoffLocation;
         show: ' | Distance: ', distanceMiles printString, ' miles';
         show: ' | Fare: $', fareTotal printString;
-        cr.
+        cr.!
+
+!
 
 
+"  PREMIUM RIDE METHODS "
 
-"PremiumRide class"
+PremiumRide methodsFor: 'api'!
 
-Ride subclass: #PremiumRide
-    instanceVariableNames: ''
-    classVariableNames: ''
-    poolDictionaries: ''
-    category: 'RideSharing'.
-
-
-PremiumRide >> computeFare
+computeFare
     "Premium ride has higher rate and a luxury fee."
     | baseFare perMile luxuryFee total |
     baseFare := 4.0.
@@ -104,98 +120,88 @@ PremiumRide >> computeFare
     luxuryFee := 1.5.
     total := baseFare + (perMile * distanceMiles) + luxuryFee.
     self fareTotal: total.
-    ^ total.
+    ^ total.!
 
-
-PremiumRide >> printRideDetails
+printRideDetails
     Transcript
         show: '[Premium]  Ride ID: ', rideId printString;
         show: ' | From: ', pickupLocation;
         show: ' | To: ', dropoffLocation;
         show: ' | Distance: ', distanceMiles printString, ' miles';
         show: ' | Fare: $', fareTotal printString;
-        cr.
+        cr.!
+
+!
 
 
+"  DRIVER METHODS  "
 
-"Driver class "
+Driver methodsFor: 'initialization'!
 
-Object subclass: #Driver
-    instanceVariableNames: 'driverId driverName driverRating completedRides'
-    classVariableNames: ''
-    poolDictionaries: ''
-    category: 'RideSharing'.
-
-
-Driver >> initializeWithId: anId
-          name: aName
-          rating: aRating
+initializeWithId: anId
+    name: aName
+    rating: aRating
     driverId := anId.
     driverName := aName.
     driverRating := aRating.
-    completedRides := OrderedCollection new.
+    completedRides := OrderedCollection new.!
 
+!
 
-Driver >> addCompletedRide: aRide
-    "Encapsulated modification of completedRides list."
-    completedRides add: aRide.
+Driver methodsFor: 'api'!
 
+addCompletedRide: aRide
+    "Encapsulated modification of completedRides."
+    completedRides add: aRide.!
 
-Driver >> printDriverInfo
+printDriverInfo
     Transcript
         show: 'Driver ID: ', driverId printString;
         show: ' | Name: ', driverName;
         show: ' | Rating: ', driverRating printString;
         show: ' | Total rides: ', completedRides size printString;
-        cr.
+        cr.!
 
-
-Driver >> totalEarnings
+totalEarnings
     | sum |
     sum := 0.0.
-    completedRides do: [:ride |
-        sum := sum + ride fareTotal].
-    ^ sum.
+    completedRides do: [:ride | sum := sum + ride fareTotal ].
+    ^ sum.!
+
+!
 
 
+"  RIDER METHODS  "
 
-" Rider class"
+Rider methodsFor: 'initialization'!
 
-Object subclass: #Rider
-    instanceVariableNames: 'riderId riderName rideHistory'
-    classVariableNames: ''
-    poolDictionaries: ''
-    category: 'RideSharing'.
-
-
-Rider >> initializeWithId: anId name: aName
+initializeWithId: anId
+    name: aName
     riderId := anId.
     riderName := aName.
-    rideHistory := OrderedCollection new.
+    rideHistory := OrderedCollection new.!
 
+!
 
-Rider >> requestRide: aRide
-    "Encapsulated modification of rideHistory list."
-    rideHistory add: aRide.
+Rider methodsFor: 'api'!
 
+requestRide: aRide
+    "Encapsulated modification of rideHistory."
+    rideHistory add: aRide.!
 
-Rider >> printRideHistory
+printRideHistory
     Transcript
         show: 'Rider ID: ', riderId printString;
         show: ' | Name: ', riderName;
         cr.
     Transcript show: 'Ride history:'; cr.
-    rideHistory do: [:ride |
-        ride printRideDetails].
+    rideHistory do: [:ride | ride printRideDetails ].!
 
-
-Rider >> averageFare
+averageFare
     rideHistory isEmpty ifTrue: [ ^ 0.0 ].
     | sum |
     sum := 0.0.
-    rideHistory do: [:ride |
-        sum := sum + ride fareTotal ].
-    ^ sum / rideHistory size.
+    rideHistory do: [:ride | sum := sum + ride fareTotal ].
+    ^ sum / rideHistory size.!
 
-
-
+!
